@@ -1,59 +1,23 @@
-// You’re going to store the gameboard as an array inside of a Gameboard object, so start there! 
-    // Your players are also going to be stored in objects, and you’re probably going to want an object to control the flow of the game itself.
-
-// Your main goal here is to have as little global code as possible. 
-    // Try tucking everything away inside of a module or factory. 
-        // Rule of thumb: if you only ever need ONE of something (gameBoard, displayController), use a module. 
-        // If you need multiples of something (players!), create them with factories.
-
 const game = (() => {
     //Create the 3x3 game board structure
-    /* const topRow = [null, null, null];
-    const midRow = [null, null, null];
-    const bottomRow = [null, null, null]; */
-    const topRow = ["O", "O", "X"];
-    const midRow = [null, null, "O"];
-    const bottomRow = ["O", "O", "X"];
-    let gameBoard = [topRow, midRow, bottomRow];
+    let gameBoard = 
+        [[null, null, null]
+        ,[null, null, null]
+        ,[null, null, null]];
     
     //Place a player's marker on the cell of their choice
-    const updateGameBoard = (playerMarker, cellString) => {
-        const cellToMark = cellString.split('-');
-   
-        switch (cellToMark[0]) {
-            case 'topRow':
-                topRow[cellToMark[1]] = playerMarker;
-                break;
-            case 'midRow':
-                midRow[cellToMark[1]] = playerMarker;
-                break;
-            case 'bottomRow':
-                bottomRow[cellToMark[1]] = playerMarker;
-                break;
-        }
-
-        //Check gameboard to see if a player has won the game
+    const updateGameBoard = (playerMarker, row, column) => {
+        gameBoard[row][column] = playerMarker;
     }    
     
     //Show the current game board
     const showGameBoard = () => {
-        console.log(gameBoard);
-    }
-
-    //Check if the next turn can be taken, i.e. empty cells are available
-    const checkForAvailableTurns = () => {
-        for (let i = 0; i < gameBoard.length; i++) {
-            for (let j = 0; j < gameBoard[i].length; j++) {
-                if (!gameBoard[i][j]) { return true;}
-            }
-        }
-        return false;
+        return gameBoard;
     }
 
     //Module returns the following functions
     return {
         showGameBoard
-        , checkForAvailableTurns
         , updateGameBoard
     }
 })()
@@ -73,37 +37,101 @@ const players = [playerOne, playerTwo];
 //Create a game controller object as a module
 const gameController = (() => {
     let whoseTurn;
+    //Check if the next turn can be taken, i.e. an empty cell is available
+
+    const checkGameStatus = () => {
+        let currentBoard = game.showGameBoard();
+        let possibleWinCombinations = [];
+        let winner;
+        let isTie = false;
+        let continueGame = true;
+        
+        //Check if there's a tie
+        const checkForTie = () => {
+            for (row = 0; row < currentBoard.length; row++) {
+                for (col = 0; col < currentBoard[row].length; col++) {
+                    if (!currentBoard[row][col]) {
+                        return;
+                    }
+                }
+            }
+            isTie = true;
+        }
+        //Check if a player has won the game
+        //Check for a "row win"
+        for (let row = 0; row < currentBoard.length; row++) {
+            possibleWinCombinations.push(currentBoard[row])
+        }
+        //Check for a "column win"
+        for (let col = 0; col < currentBoard[0].length; col++) {
+            const extractColumns = (arr, n) => arr.map(x => x[n]);
+            possibleWinCombinations.push(extractColumns(currentBoard,col));
+        }
+        //Check for a "diagonal win"
+        let topLeftDiag = [];
+        let bottomLeftDiag = [];
+
+        for (let row = 0; row < currentBoard.length; row++) {
+            topLeftDiag.push(currentBoard[row][row]);
+            bottomLeftDiag.push(currentBoard[row][currentBoard.length-1-row]);    
+        }
+        possibleWinCombinations.push(topLeftDiag,bottomLeftDiag);
+
+        //Return the marker of the winning player if there is one; otherwise return false
+        const checkForWinningCombination = arr => arr.every(marker => marker !== null && marker === arr[0]);
+        for (let i = 0; i < possibleWinCombinations.length; i++) {
+            if (checkForWinningCombination(possibleWinCombinations[i])) {
+                winner = possibleWinCombinations[i][0];
+            };
+        }
+
+        checkForTie();
+
+        if (!!winner || isTie) {
+            continueGame = false;
+        }
+        
+        return {
+            winner 
+            , isTie 
+            , continueGame
+        }
+
+
+    }
+
 
     const takeTurn = (player) => {
         //Update turn with current player
         whoseTurn = player;
-        //Store the player's selected cell in a variable
-        let selectedCell = prompt(`Hi, ${player.name}, please select a cell.`);
+        //Store the row and column of the player's selected cell in their respective variables
+        let selectedRow = prompt(`Hi, ${player.name}, please select a row, 0-2.`);
+        let selectedColumn = prompt(`Hi, ${player.name}, please select a column, 0-2.`);
         //Update the game board
-        game.updateGameBoard(player.marker, selectedCell);
-        //Check if the next turn can be taken, i.e. an empty cell is available
-        if (!game.checkForAvailableTurns()) {
-            //Game over
-            console.log("board full")
-            return;
+        game.updateGameBoard(player.marker, selectedRow, selectedColumn);
+        //Check if game is over
+        if (!!gameController.checkGameStatus().winner) {
+            //Declare the winner            
+            console.log("The winner plays with the marker " + gameController.checkGameStatus().winner);
+        } else if (!!gameController.checkGameStatus().isTie) {
+            //Declare the result as a tie
+            console.log("The game is a tie!");
         } else {
-            //Update the turn with the next player
-            whoseTurn = (whoseTurn === playerOne) ? playerTwo : playerOne;
+            //Game will continue; update turn with next player
+            whoseTurn = (whoseTurn === playerOne) ? playerTwo : playerOne; 
         }
-    }
+        }
+    
 
+    //Check gameboard to see if a player has won the game
+    
     const showWhoseTurn = () => {
         return whoseTurn;
     }
 
     return {
         showWhoseTurn
+        , checkGameStatus
         , takeTurn
     }
 })()
-
-
-    //Keep track of which player's turn it is
-    //After each turn, update the gameboard
-    //After each turn, check if the game has ended, i.e. won or tied (no more cells available)
-    //After each turn, update which player's turn it is
