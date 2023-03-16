@@ -10,6 +10,10 @@ const gameBoard = (() => {
   ];
   
   const grid = document.querySelector('.ttt-grid');
+    
+  grid.addEventListener('click', e => {
+    console.log(e.target.id);
+  })
 
   for (let row = 0; row < board.length; row += 1) {
     for (let col = 0; col < board[row].length; col += 1) {
@@ -65,6 +69,10 @@ players.push(playerTwo);
 // Create a game controller object as a module
 const gameController = (() => {
   let whoseTurn;
+  const gameMessage = document.querySelector('#prompt');
+
+  const MESSAGE_WIN = ' wins the game!';
+  const MESSAGE_TIE = `It's a tie!`;
 
   const checkStatus = () => {
     const currentBoard = gameBoard.show();
@@ -109,9 +117,8 @@ const gameController = (() => {
     const checkForWinningCombination = (arr) => arr.every((marker) => (marker !== undefined && marker === arr[0]));
 
     for (let i = 0; i < possibleWinCombinations.length; i += 1) {
-      console.log(checkForWinningCombination(possibleWinCombinations[i]));
       if (checkForWinningCombination(possibleWinCombinations[i])) {
-        gameStatus.winner = possibleWinCombinations[i][0];
+        gameStatus.winner = players.find(player => player.marker === possibleWinCombinations[i][0]);
       }
     }
     
@@ -137,20 +144,16 @@ const gameController = (() => {
     }
     // Update the game board
     gameBoard.update(player.marker, selectedRow, selectedColumn);
-    console.log(gameBoard.show());
+    
     // Check if game is over
     const {winner} = gameController.checkStatus().gameStatus;
 
     if (winner) {
       // Declare the winner
-      console.log(
-        `The winner plays with the marker ${
-          gameController.checkStatus().gameStatus.winner
-        }`,
-      );
+      gameMessage.innerText = gameController.checkStatus().gameStatus.winner.name + MESSAGE_WIN 
     } else if (winner === null) {
       // Declare the result as a tie
-      console.log('The game is a tie!');
+      gameMessage.innerText = MESSAGE_TIE;
     } else {
       // Game will continue; update turn with next player
       whoseTurn = whoseTurn === playerOne ? playerTwo : playerOne;
