@@ -57,11 +57,12 @@ const gameController = (() => {
 
     // Check if there's a tie
     const checkForTie = () => {
-      for (let row = 0; row < currentBoard.length; row =+ 1) {
-        for (let col = 0; col < currentBoard[row].length; col =+ 1) {
+      for (let row = 0; row < currentBoard.length; row += 1) {
+        for (let col = 0; col < currentBoard[row].length; col += 1) {
+          // Check for an empty cell, i.e. not yet a tie
           if (!currentBoard[row][col]) {
             return;
-          } break;
+          } 
         }
       }
       // Assign null to gameStatus.winner if the game ends in a tie
@@ -85,14 +86,13 @@ const gameController = (() => {
       bottomLeftDiag.push(currentBoard[row][currentBoard.length - 1 - row]);
     }
     possibleWinCombinations.push(topLeftDiag, bottomLeftDiag);
+    
     // Assign the marker of the winner to the game status if there is one
-    const checkForWinningCombination = (arr) => {
-      arr.every((marker) => marker !== undefined && marker === arr[0]);
-    };
+    const checkForWinningCombination = (arr) => arr.every((marker) => (marker !== undefined && marker === arr[0]));
 
     for (let i = 0; i < possibleWinCombinations.length; i += 1) {
+      console.log(checkForWinningCombination(possibleWinCombinations[i]));
       if (checkForWinningCombination(possibleWinCombinations[i])) {
-        console.log('does this run');
         gameStatus.winner = possibleWinCombinations[i][0];
       }
     }
@@ -119,6 +119,7 @@ const gameController = (() => {
     }
     // Update the game board
     gameBoard.update(player.marker, selectedRow, selectedColumn);
+    console.log(gameBoard.show());
     // Check if game is over
     const {winner} = gameController.checkStatus().gameStatus;
 
