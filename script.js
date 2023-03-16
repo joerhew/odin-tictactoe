@@ -1,14 +1,32 @@
+
 const gameBoard = (() => {
+  // Initialize the board
+  
   // Create the 3x3 game board structure
   const board = [
     [undefined, undefined, undefined],
     [undefined, undefined, undefined],
     [undefined, undefined, undefined],
   ];
+  
+  const grid = document.querySelector('.ttt-grid');
+
+  for (let row = 0; row < board.length; row += 1) {
+    for (let col = 0; col < board[row].length; col += 1) {
+      const cell = document.createElement('div');
+      cell.classList.add('ttt-cell');
+      cell.id = `ttt-cell-${row}-${col}`;
+      grid.appendChild(cell);
+    } 
+  }
 
   // Place a player's marker on the cell of their choice
   const update = (playerMarker, row, column) => {
+    const cellToUpdate = document.querySelector(`#ttt-cell-${row}-${column}`);
+    // Update board
     board[row][column] = playerMarker;
+    // Update HTML board
+    cellToUpdate.innerText = playerMarker;
   };
 
   // Show the current game board

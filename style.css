@@ -1,0 +1,36 @@
+body {
+  
+}
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: max(90%, 1000px);
+}
+
+.prompt {
+  
+}
+
+.ttt-grid {
+  display: grid;
+  grid-template: repeat(3,1fr) / repeat(3,1fr);
+  width: min-content;
+}
+
+.ttt-cell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: fuchsia;
+  border: 1px solid black;
+  width: 200px;
+  height: 200px;
+}
+
+.btn-container {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
