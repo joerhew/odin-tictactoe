@@ -12,7 +12,13 @@ const gameBoard = (() => {
   const grid = document.querySelector('.ttt-grid');
     
   grid.addEventListener('click', e => {
-    console.log(e.target.id);
+    const regex =  /(?<row>\d)-(?<col>\d)/
+    const htmlID = e.target.id;
+    const clickedRowAndCol = htmlID.match(regex);
+    const clickedRow = clickedRowAndCol.groups.row;
+    const clickedCol = clickedRowAndCol.groups.col;
+
+    gameController.takeTurn(gameController.showWhoseTurn(),clickedRow,clickedCol);
   })
 
   for (let row = 0; row < board.length; row += 1) {
@@ -68,7 +74,7 @@ players.push(playerTwo);
 
 // Create a game controller object as a module
 const gameController = (() => {
-  let whoseTurn;
+  let whoseTurn = playerOne;
   const gameMessage = document.querySelector('#prompt');
 
   const MESSAGE_WIN = ' wins the game!';
@@ -129,14 +135,12 @@ const gameController = (() => {
     };
   };
 
-  const takeTurn = (player) => {
+  const takeTurn = (player,row,col) => {
     // Update turn with current player
     whoseTurn = player;
-    // Store the row and column of the player's selected cell in their respective variables
-    const selectedRow = prompt(`Hi, ${player.name}, please select a row, 0-2.`);
-    const selectedColumn = prompt(
-      `Hi, ${player.name}, please select a column, 0-2.`,
-    );
+    const selectedRow = row;
+    const selectedColumn = col;
+
     // Check if the selected cell is available for play
     if (gameBoard.show()[selectedRow][selectedColumn]) {
         alert("That cell is already taken. Try another one.");
