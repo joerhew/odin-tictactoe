@@ -1,33 +1,71 @@
 
 const gameBoard = (() => {
-  // Initialize the board
   
-  // Create the 3x3 game board structure
+  const BTN_START = document.createElement('button');
+  const GRID = document.querySelector('.ttt-grid');
+
+  BTN_START.classList.add('btn-start');
+  BTN_START.innerText = 'START';
+  GRID.parentNode.insertBefore(BTN_START, GRID);
+
+  BTN_START.addEventListener('click', () => {
+    BTN_START.classList.add('hidden');
+    create();
+  })
+  
   const board = [
     [undefined, undefined, undefined],
     [undefined, undefined, undefined],
     [undefined, undefined, undefined],
   ];
+
+  const BTN_RESET = document.createElement('button');
+  const BTN_RESTART = document.createElement('button');
+  const CONTAINER_BTN = document.querySelector('.btn-container');
+
+  BTN_RESET.innerText = 'Select new players';
+  BTN_RESTART.innerText = 'Restart game';
+
+  CONTAINER_BTN.appendChild(BTN_RESET);
+  CONTAINER_BTN.appendChild(BTN_RESTART);
+
+  BTN_RESET.classList.add('hidden');
+  BTN_RESTART.classList.add('hidden');
+
+  const create = () => {
+    // Add event listener to clicks on game board
+    GRID.addEventListener('click', e => {
+      const regex =  /(?<row>\d)-(?<col>\d)/
+      const htmlID = e.target.id;
+      const clickedRowAndCol = htmlID.match(regex);
+      const clickedRow = clickedRowAndCol.groups.row;
+      const clickedCol = clickedRowAndCol.groups.col;
   
-  const grid = document.querySelector('.ttt-grid');
-    
-  grid.addEventListener('click', e => {
-    const regex =  /(?<row>\d)-(?<col>\d)/
-    const htmlID = e.target.id;
-    const clickedRowAndCol = htmlID.match(regex);
-    const clickedRow = clickedRowAndCol.groups.row;
-    const clickedCol = clickedRowAndCol.groups.col;
+      gameController.takeTurn(gameController.showWhoseTurn(),clickedRow,clickedCol);
+    })
+  
+    for (let row = 0; row < board.length; row += 1) {
+      for (let col = 0; col < board[row].length; col += 1) {
+        const cell = document.createElement('div');
+        cell.classList.add('ttt-cell');
+        cell.id = `ttt-cell-${row}-${col}`;
+        GRID.appendChild(cell);
+      } 
+    }
 
-    gameController.takeTurn(gameController.showWhoseTurn(),clickedRow,clickedCol);
-  })
+    BTN_RESET.classList.toggle('hidden');
+    BTN_RESET.addEventListener('click', () => reset())
 
-  for (let row = 0; row < board.length; row += 1) {
-    for (let col = 0; col < board[row].length; col += 1) {
-      const cell = document.createElement('div');
-      cell.classList.add('ttt-cell');
-      cell.id = `ttt-cell-${row}-${col}`;
-      grid.appendChild(cell);
-    } 
+    BTN_RESTART.classList.toggle('hidden');
+    BTN_RESTART.addEventListener('click', () => restart())
+  }
+
+  const reset = () => {
+    console.log('reset');
+  }
+
+  const restart = () => {
+    console.log('restart');
   }
 
   // Place a player's marker on the cell of their choice
@@ -75,10 +113,11 @@ players.push(playerTwo);
 // Create a game controller object as a module
 const gameController = (() => {
   let whoseTurn = playerOne;
+  
   const gameMessage = document.querySelector('#prompt');
-
   const MESSAGE_WIN = ' wins the game!';
   const MESSAGE_TIE = `It's a tie!`;
+  const MESSAGE_ERR_CELL_TAKEN = 'That cell is already taken. Try another one.';
 
   const checkStatus = () => {
     const currentBoard = gameBoard.show();
@@ -137,13 +176,12 @@ const gameController = (() => {
 
   const takeTurn = (player,row,col) => {
     // Update turn with current player
-    whoseTurn = player;
     const selectedRow = row;
     const selectedColumn = col;
 
     // Check if the selected cell is available for play
     if (gameBoard.show()[selectedRow][selectedColumn]) {
-        alert("That cell is already taken. Try another one.");
+        gameMessage.innerText = MESSAGE_ERR_CELL_TAKEN;
         return;
     }
     // Update the game board
