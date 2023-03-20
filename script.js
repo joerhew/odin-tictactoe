@@ -1,17 +1,36 @@
+// Create a player object, using a factory function
+const playerFactory = (name, marker) => ({
+  name,
+  marker,
+});
+// Create 2 players, each with their unique marker
+const players = [];
+let whoseTurn;
+let playerOne;
+let playerTwo;
 
-const gameBoard = (() => {
-  
-  const BTN_START = document.createElement('button');
-  const GRID = document.querySelector('.ttt-grid');
+// Game board
+const gameBoard = (() => { 
+  const CONTAINER = document.querySelector('.container');
+  const BTN_START = document.querySelector('.btn-start');
+  const PLAYER_FORM = document.querySelector('form');
+  const PLAYER_ONE_NAME = document.querySelector('#player-1-name');
+  const PLAYER_ONE_MARKER = document.querySelector('#player-1-marker');
+  const PLAYER_TWO_NAME = document.querySelector('#player-2-name');
+  const PLAYER_TWO_MARKER = document.querySelector('#player-2-marker');
 
-  BTN_START.classList.add('btn-start');
-  BTN_START.innerText = 'START';
-  GRID.parentNode.insertBefore(BTN_START, GRID);
-
-  BTN_START.addEventListener('click', () => {
-    BTN_START.classList.add('hidden');
+  PLAYER_FORM.addEventListener('submit', (e) => {
+    PLAYER_FORM.classList.add('hidden');
+    playerOne = playerFactory(PLAYER_ONE_NAME.value, PLAYER_ONE_MARKER.value);
+    playerTwo = playerFactory(PLAYER_TWO_NAME.value, PLAYER_TWO_MARKER.value);
+    players.push(playerOne);
+    players.push(playerTwo);
+    whoseTurn = playerOne;
     create();
-  })
+    e.preventDefault();
+    e.stopPropagation();
+  }) 
+  console.log("hi");
   
   const board = [
     [undefined, undefined, undefined],
@@ -34,13 +53,17 @@ const gameBoard = (() => {
 
   const create = () => {
     // Add event listener to clicks on game board
+    const GRID = document.createElement('div');
+    GRID.classList.toggle('ttt-grid');
+    CONTAINER.insertBefore(GRID,CONTAINER_BTN);
+    
     GRID.addEventListener('click', e => {
       const regex =  /(?<row>\d)-(?<col>\d)/
       const htmlID = e.target.id;
       const clickedRowAndCol = htmlID.match(regex);
       const clickedRow = clickedRowAndCol.groups.row;
       const clickedCol = clickedRowAndCol.groups.col;
-  
+
       gameController.takeTurn(gameController.showWhoseTurn(),clickedRow,clickedCol);
     })
   
@@ -50,22 +73,23 @@ const gameBoard = (() => {
         cell.classList.add('ttt-cell');
         cell.id = `ttt-cell-${row}-${col}`;
         GRID.appendChild(cell);
-      } 
+      }
     }
 
     BTN_RESET.classList.toggle('hidden');
     BTN_RESET.addEventListener('click', () => reset())
 
     BTN_RESTART.classList.toggle('hidden');
-    BTN_RESTART.addEventListener('click', () => restart())
+    BTN_RESTART.addEventListener('click', () => clear())
   }
 
   const reset = () => {
-    console.log('reset');
-  }
-
-  const restart = () => {
-    console.log('restart');
+    clear();
+    BTN_RESET.classList.add('hidden');
+    BTN_RESTART.classList.add('hidden');
+    PLAYER_FORM.classList.remove('hidden');
+    
+    document.querySelector('.ttt-grid').remove();
   }
 
   // Place a player's marker on the cell of their choice
@@ -84,6 +108,7 @@ const gameBoard = (() => {
     for (let i = 0; i < board.length; i += 1) {
         for (let j = 0; j < board[i].length; j += 1) {
             board[i][j] = undefined;
+            document.querySelector(`#ttt-cell-${i}-${j}`).innerText = "";
         }
     }
   }
@@ -96,28 +121,15 @@ const gameBoard = (() => {
   };
 })();
 
-// Create a player object, using a factory function
-const playerFactory = (name, marker) => ({
-  name,
-  marker,
-});
-// Create 2 players, each with their unique marker
-const players = [];
-
-const playerOne = playerFactory('Joe', 'O');
-const playerTwo = playerFactory('Felix', 'X');
-
-players.push(playerOne);
-players.push(playerTwo);
-
 // Create a game controller object as a module
 const gameController = (() => {
-  let whoseTurn = playerOne;
   
   const gameMessage = document.querySelector('#prompt');
   const MESSAGE_WIN = ' wins the game!';
   const MESSAGE_TIE = `It's a tie!`;
   const MESSAGE_ERR_CELL_TAKEN = 'That cell is already taken. Try another one.';
+  const MESSAGE_WHOSE_TURN_FIRST = `It's `
+  const MESSAGE_WHOSE_TURN_SECOND = `'s turn!`
 
   const checkStatus = () => {
     const currentBoard = gameBoard.show();
@@ -199,6 +211,7 @@ const gameController = (() => {
     } else {
       // Game will continue; update turn with next player
       whoseTurn = whoseTurn === playerOne ? playerTwo : playerOne;
+      gameMessage.innerText = MESSAGE_WHOSE_TURN_FIRST + whoseTurn.name + MESSAGE_WHOSE_TURN_SECOND;
     }
   };
 
