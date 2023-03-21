@@ -1,7 +1,59 @@
+:root {
+  --font-header: 'Bungee Shade', sans-serif;
+  --font-text: 'Bangers', serif;
+
+  --col-primary: #002B5B;
+  --col-highlight: #EA5455;
+  --col-highlight-dark: #c03333;
+  --col-bg-dark: #d1c9bd;
+  --col-bg-norm: #E4DCCF;
+  --col-bg-light: #F9F5EB;
+
+  font-family: var(--font-header);
+  color: var(--col-primary);
+}
+
 body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  background-color: var(--col-bg-light);
+}
+
+h1 {
+  font-size: 4rem;
+  color: var(--col-highlight);
+}
+
+h2 {
+  font-size: 2rem;
+}
+
+input {
+  flex: 1;
+  height: 2rem;
+  border: 1px solid var(--col-bg-dark);
+  border-radius: 15px;
+  width: 150px;
+  padding: 0 0.8rem 0 0.8rem;
+}
+
+button {
+  border-radius: 20px;
+  height: 5rem;
+  min-width: 10rem;
+  border: none;
+  background-color: var(--col-highlight);
+  cursor: pointer;
+  color: var(--col-bg-light);
+  padding: 0.5rem;
+
+  font-size: 1.6rem;
+  font-family: var(--font-text);
+}
+
+button:hover {
+  transition: 0.15s;
 }
 
 .hidden {
@@ -22,20 +74,39 @@ body {
   justify-content: center;
 }
 
+.player:first-child {
+  margin-right: 2rem;
+}
+
 .player-info-row {
   display: flex;
   flex-wrap: wrap;
   flex: 1;
+  align-items: center;
+}
+
+.player-info-row:first-child {
+  margin-bottom: 1rem;
 }
 
 .player-label {
-  flex-grow: 1;
+  flex: 1;
   margin-right: 2rem;
+  height: min-content;
+  max-width: 205px;
+
+  font-family: var(--font-text);
+  font-size: 1.8rem;
 }
 
 .start-btn-container {
   display: flex;
   justify-content: center;
+  margin-top: 2rem;
+}
+
+.btn-start:hover {
+  background-color: var(--col-highlight-dark);
 }
 
 .ttt-grid {
@@ -48,10 +119,13 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: fuchsia;
-  border: 1px solid black;
+  background-color: var(--col-bg-norm);
+  border: 1px solid var(--col-bg-dark);
+  border-radius: 20px;
   width: 200px;
   height: 200px;
+
+  font-size: 5rem;
 }
 
 .btn-container {
@@ -59,4 +133,35 @@ body {
   display: flex;
   flex-direction: row;
   justify-content: center;
+}
+
+.btn-container button {
+  color: var(--col-primary);
+  background-color: var(--col-bg-light);
+  border: 2px solid var(--col-primary);
+}
+
+.btn-reset {
+  margin-right: 1rem;
+}
+
+@media (max-width: 998px) {
+  .player:first-child {
+    margin-right: 0;
+    margin-bottom: 2rem;
+  }
+}
+
+@media (max-width: 610px) {
+  h1 {
+    font-size: 3rem;
+  }
+
+  h2 {
+    font-size: 1.8rem;
+  }
+}
+
+@media (max-width: 534px) {
+  
 }

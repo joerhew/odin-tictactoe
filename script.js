@@ -48,8 +48,8 @@ const gameBoard = (() => {
   CONTAINER_BTN.appendChild(BTN_RESET);
   CONTAINER_BTN.appendChild(BTN_RESTART);
 
-  BTN_RESET.classList.add('hidden');
-  BTN_RESTART.classList.add('hidden');
+  BTN_RESET.classList.add('hidden','btn-reset');
+  BTN_RESTART.classList.add('hidden','btn-restart');
 
   const create = () => {
     // Add event listener to clicks on game board
