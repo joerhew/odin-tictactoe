@@ -10,6 +10,33 @@ let playerOne;
 let playerTwo;
 
 // Game board
+const gameMessages = (() => {
+  const gameMessage = document.querySelector('#prompt');
+
+  const MESSAGE_INITIAL = 'Up for a game?';
+  const MESSAGE_WIN = ' wins the game!';
+  const MESSAGE_TIE = `It's a tie!`;
+  const MESSAGE_ERR_CELL_TAKEN = 'That cell is already taken. Try another one.';
+  const MESSAGE_WHOSE_TURN_FIRST = `It's `
+  const MESSAGE_WHOSE_TURN_SECOND = `'s turn!`
+
+  const displayMessage = (msg) => {
+    gameMessage.innerText = msg;
+  }
+
+  displayMessage(MESSAGE_INITIAL);
+
+  return {
+    displayMessage,
+    MESSAGE_INITIAL,
+    MESSAGE_WIN,
+    MESSAGE_TIE,
+    MESSAGE_ERR_CELL_TAKEN,
+    MESSAGE_WHOSE_TURN_FIRST,
+    MESSAGE_WHOSE_TURN_SECOND
+  }
+})();
+
 const gameBoard = (() => { 
   const CONTAINER = document.querySelector('.container');
   const BTN_START = document.querySelector('.btn-start');
@@ -26,6 +53,8 @@ const gameBoard = (() => {
     players.push(playerOne);
     players.push(playerTwo);
     whoseTurn = playerOne;
+    console.log("wtf");
+    gameMessages.displayMessage(gameMessages.MESSAGE_WHOSE_TURN_FIRST + whoseTurn.name + gameMessages.MESSAGE_WHOSE_TURN_SECOND);
     create();
     e.preventDefault();
     e.stopPropagation();
@@ -85,6 +114,7 @@ const gameBoard = (() => {
 
   const reset = () => {
     clear();
+    gameMessages.displayMessage(gameMessages.MESSAGE_INITIAL);
     BTN_RESET.classList.add('hidden');
     BTN_RESTART.classList.add('hidden');
     PLAYER_FORM.classList.remove('hidden');
@@ -105,6 +135,7 @@ const gameBoard = (() => {
   const show = () => board;
 
   const clear = () => {
+    gameMessages.displayMessage(gameMessages.MESSAGE_WHOSE_TURN_FIRST + whoseTurn.name + gameMessages.MESSAGE_WHOSE_TURN_SECOND);
     for (let i = 0; i < board.length; i += 1) {
         for (let j = 0; j < board[i].length; j += 1) {
             board[i][j] = undefined;
@@ -123,13 +154,6 @@ const gameBoard = (() => {
 
 // Create a game controller object as a module
 const gameController = (() => {
-  
-  const gameMessage = document.querySelector('#prompt');
-  const MESSAGE_WIN = ' wins the game!';
-  const MESSAGE_TIE = `It's a tie!`;
-  const MESSAGE_ERR_CELL_TAKEN = 'That cell is already taken. Try another one.';
-  const MESSAGE_WHOSE_TURN_FIRST = `It's `
-  const MESSAGE_WHOSE_TURN_SECOND = `'s turn!`
 
   const checkStatus = () => {
     const currentBoard = gameBoard.show();
@@ -193,7 +217,7 @@ const gameController = (() => {
 
     // Check if the selected cell is available for play
     if (gameBoard.show()[selectedRow][selectedColumn]) {
-        gameMessage.innerText = MESSAGE_ERR_CELL_TAKEN;
+        gameMessages.displayMessage(gameMessages.MESSAGE_ERR_CELL_TAKEN);
         return;
     }
     // Update the game board
@@ -204,14 +228,14 @@ const gameController = (() => {
 
     if (winner) {
       // Declare the winner
-      gameMessage.innerText = gameController.checkStatus().gameStatus.winner.name + MESSAGE_WIN 
+      gameMessages.displayMessage(gameController.checkStatus().gameStatus.winner.name + gameMessages.MESSAGE_WIN);
     } else if (winner === null) {
       // Declare the result as a tie
-      gameMessage.innerText = MESSAGE_TIE;
+      gameMessages.displayMessage(gameMessages.MESSAGE_TIE);
     } else {
       // Game will continue; update turn with next player
       whoseTurn = whoseTurn === playerOne ? playerTwo : playerOne;
-      gameMessage.innerText = MESSAGE_WHOSE_TURN_FIRST + whoseTurn.name + MESSAGE_WHOSE_TURN_SECOND;
+      gameMessages.displayMessage(gameMessages.MESSAGE_WHOSE_TURN_FIRST + whoseTurn.name + gameMessages.MESSAGE_WHOSE_TURN_SECOND);
     }
   };
 
